@@ -5,6 +5,7 @@ const Contenedor = require("./controllers/productsController");
 const productos = new Contenedor("./controllers/productos.json");
 const app = express();
 const PORT = 8080;
+const notFound = { error: "Ruta no encontrada" };
 
 /* middlewares incorporados */
 app.use(bp.json());
@@ -18,6 +19,14 @@ app.get("/api", async (req, res) => {
     res.status(200).send(
         `<h1>Bienvenido a mi primer entrega del proyecto de backend! 🚀💫💻</h1>`
     );
+});
+
+app.use((req, res, next) => {
+    if (!req.route) {
+        res.status(404).send(notFound);
+    } else {
+        next();
+    }
 });
 
 const server = app.listen(PORT, () => {

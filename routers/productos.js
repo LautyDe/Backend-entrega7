@@ -3,6 +3,7 @@ const router = Router();
 const Contenedor = require("../controllers/productsController.js");
 const productos = new Contenedor("./controllers/productos.json");
 const notFound = { error: "Producto no encontrado" };
+const forbidden = { error: "Acceso no autorizado" };
 
 /* ok: 200
    created: 201
@@ -13,12 +14,13 @@ const notFound = { error: "Producto no encontrado" };
    internal server error: 500
     */
 
-const middleware = (req, res, next) => {
+/* incorporo middleware con clave en el header para continuar */
+const acceso = (req, res, next) => {
     const key = req.headers.key;
     if (key == 1234) {
         next();
     } else {
-        res.status(403).send("Acceso denegado!");
+        res.status(403).json(forbidden);
     }
 };
 
@@ -38,7 +40,7 @@ router.get("/:id", async (req, res) => {
     res.status(200).json(producto);
 });
 
-router.post("/", middleware, async (req, res) => {
+router.post("/", acceso, async (req, res) => {
     console.log(`post req recibida con exito`);
     const data = req.body;
     console.log(data);
@@ -47,7 +49,7 @@ router.post("/", middleware, async (req, res) => {
     res.status(201).json(data);
 });
 
-router.put("/:id", middleware, async (req, res) => {
+router.put("/:id", acceso, async (req, res) => {
     console.log(`put req recibida con exito`);
     const id = parseInt(req.params.id);
     const data = req.body;
@@ -56,7 +58,7 @@ router.put("/:id", middleware, async (req, res) => {
     res.status(200).json(productoEditado);
 });
 
-router.delete("/:id", middleware, async (req, res) => {
+router.delete("/:id", acceso, async (req, res) => {
     console.log(`delete req recibida con exito`);
     const id = parseInt(req.params.id);
     const producto = await productos.getById(id);

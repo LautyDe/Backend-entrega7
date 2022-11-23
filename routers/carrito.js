@@ -1,41 +1,83 @@
 const { Router } = require("express");
 const router = Router();
 const Contenedor = require("../controllers/productsController.js");
-const carrito = new Contenedor("./controllers/carritos.json");
+const carritos = new Contenedor("./controllers/carritos.json");
+const productos = new Contenedor("./controllers/productos.json");
 const notFound = { error: "Producto no encontrado" };
+
+/* ok: 200
+   created: 201
+   no content: 204
+   bad request: 400
+   forbidden: 403
+   not found: 404
+   internal server error: 500
+    */
 
 router.post("/", async (req, res) => {
     console.log(`post req recibida con exito`);
-    const data = [];
-    const nuevoCarrito = await carrito.save(data);
-    !data && res.status(204).json(notFound);
-    res.status(201).json(data);
+    const carrito = {
+        timestamp: Date.now(),
+        productos: [],
+    };
+    const nuevoCarrito = await carritos.save(carrito);
+    !nuevoCarrito && res.status(500).json(notFound);
+    res.status(201).send("Carrito creado con exito");
 });
 
-router.get("/:id", async (req, res) => {
+router.post("/:id/productos", async (req, res) => {
+    console.log(`post req recibida con exito`);
+    const idCarrito = parseInt(req.params.id);
+    const idProducto = req.body;
+    const carrito = await carritos.getById(idCarrito);
+    const producto = await productos.getById(idProducto);
+    carrito.productos.push(producto);
+    await carritos.modify(idCarrito, carrito);
+    res.status(201).send("Carrito modificado con exito");
+});
+
+router.delete("/:id", async (req, res) => {
+    console.log(`deleteById req recibida con exito`);
+    const idCarrito = parseInt(req.params.id);
+    const carrito = await carritos.getById(idCarrito);
+    const eliminarCarrito = await carritos.deleteById(idCarrito);
+    !carrito && res.status(404).json(notFound);
+    res.status(200).json(carrito);
+});
+
+router.delete("/:id/productos/:id_prod", async (req, res) => {
+    console.log(`deleteById req recibida con exito`);
+    const idCarrito = parseInt(req.params.id);
+    const idProducto = parseInt(req.params.id_prod);
+    const carrito = await carritos.getById(idCarrito);
+    let indexToDelete = -1;
+    carrito.productos.forEach((producto, index) => {
+        if (producto.id == idProducto) {
+            indexToDelete = index;
+        }
+    });
+    if (indexToDelete >= 0) {
+        carrito.productos.splice(indexToDelete, 1);
+    }
+    await carritos.modify(idCarrito, carrito);
+    res.status(200).json(carrito);
+});
+
+router.get("/:id/productos", async (req, res) => {
     console.log(`getById req recibida con exito`);
-    const id = parseInt(req.params.id);
-    const producto = await productos.getById(id);
-    !producto && res.status(404).json(notFound);
-    res.status(200).json(producto);
+    const idCarrito = parseInt(req.params.id);
+    const carrito = await carritos.getById(idCarrito);
+    !carrito && res.status(404).json(notFound);
+    res.status(200).json(carrito.productos);
 });
 
 router.put("/:id", async (req, res) => {
     console.log(`put req recibida con exito`);
-    const id = parseInt(req.params.id);
+    const idProducto = parseInt(req.params.id);
     const data = req.body;
-    const productoEditado = await productos.modify(id, data);
+    const productoEditado = await productos.modify(idProducto, data);
     !productoEditado && res.status(404).json(notFound);
     res.status(200).json(productoEditado);
-});
-
-router.delete("/:id", async (req, res) => {
-    console.log(`delete req recibida con exito`);
-    const id = parseInt(req.params.id);
-    const producto = await productos.getById(id);
-    const eliminarProducto = await productos.deleteById(id);
-    !producto && res.status(404).json(notFound);
-    res.status(200).json(producto);
 });
 
 module.exports = router;
