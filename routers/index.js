@@ -1,10 +1,11 @@
 const { Router } = require("express");
 const productos = require("./productos");
-const carritos = require("./carritos");
+const carrito = require("./carrito");
 
 const router = Router();
 
 router.use("/productos", productos);
-router.use("/carritos", carritos);
+
+router.use("/carrito", carrito);
 
 module.exports = router;

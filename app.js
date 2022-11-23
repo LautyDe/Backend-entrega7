@@ -13,13 +13,11 @@ app.use(bp.urlencoded({ extended: true }));
 app.use("/api", routers);
 app.use(express.static("public"));
 
-app.get("/", async (req, res) => {
-    console.log(`post req recibida con exito`);
-    const data = req.body;
-    console.log(data);
-    const nuevoProducto = await productos.save(data);
-    !data && res.status(204).json(notFound);
-    res.status(201).render("formulario", {});
+app.get("/api", async (req, res) => {
+    console.log(`get req recibida con exito`);
+    res.status(200).send(
+        `<h1>Bienvenido a mi primer entrega del proyecto de backend! 🚀💫💻</h1>`
+    );
 });
 
 const server = app.listen(PORT, () => {
