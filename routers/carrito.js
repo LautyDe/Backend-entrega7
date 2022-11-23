@@ -14,6 +14,10 @@ const notFound = { error: "Producto no encontrado" };
    internal server error: 500
     */
 
+const numeros = "0123456789";
+const letras = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+const numYLetras = numeros + letras;
+
 router.post("/", async (req, res) => {
     console.log(`post req recibida con exito`);
     const carrito = {
@@ -68,7 +72,7 @@ router.get("/:id/productos", async (req, res) => {
     const idCarrito = parseInt(req.params.id);
     const carrito = await carritos.getById(idCarrito);
     !carrito && res.status(404).json(notFound);
-    res.status(200).json(carrito.productos);
+    res.status(200).json(carrito[0].productos);
 });
 
 router.put("/:id", async (req, res) => {

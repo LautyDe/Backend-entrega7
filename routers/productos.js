@@ -15,7 +15,7 @@ const forbidden = { error: "Acceso no autorizado" };
     */
 
 /* incorporo middleware con clave en el header para continuar */
-const acceso = (req, res, next) => {
+const accessOk = (req, res, next) => {
     const key = req.headers.key;
     if (key == 1234) {
         next();
@@ -40,7 +40,7 @@ router.get("/:id", async (req, res) => {
     res.status(200).json(producto);
 });
 
-router.post("/", acceso, async (req, res) => {
+router.post("/", accessOk, async (req, res) => {
     console.log(`post req recibida con exito`);
     const data = req.body;
     console.log(data);
@@ -49,7 +49,7 @@ router.post("/", acceso, async (req, res) => {
     res.status(201).json(data);
 });
 
-router.put("/:id", acceso, async (req, res) => {
+router.put("/:id", accessOk, async (req, res) => {
     console.log(`put req recibida con exito`);
     const id = parseInt(req.params.id);
     const data = req.body;
@@ -58,7 +58,7 @@ router.put("/:id", acceso, async (req, res) => {
     res.status(200).json(productoEditado);
 });
 
-router.delete("/:id", acceso, async (req, res) => {
+router.delete("/:id", accessOk, async (req, res) => {
     console.log(`delete req recibida con exito`);
     const id = parseInt(req.params.id);
     const producto = await productos.getById(id);

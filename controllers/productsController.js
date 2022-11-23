@@ -1,5 +1,18 @@
 const fs = require("fs");
 
+const numeros = "0123456789";
+const letras = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+const numYLetras = numeros + letras;
+
+const codigoRandom = longitud => {
+    let password = "";
+    for (let i = 0; i < longitud; i++) {
+        const random = Math.floor(Math.random() * numYLetras.length);
+        password += numYLetras.charAt(random);
+    }
+    return password;
+};
+
 class Contenedor {
     constructor(archivo) {
         this.archivo = archivo;
@@ -43,7 +56,12 @@ class Contenedor {
             if (!this.exists(this.archivo)) {
                 console.log(`Se procede a crear datos nuevos`);
                 let arrayProductos = [];
-                producto = { id: 1, ...producto };
+                producto = {
+                    id: 1,
+                    timestamp: Date.now(),
+                    codigo: codigoRandom(10),
+                    ...producto,
+                };
                 arrayProductos.push(producto);
                 console.log(`Agregando producto...`);
                 await fs.writeFile(this.archivo, arrayProductos);
@@ -58,11 +76,21 @@ class Contenedor {
                     const data = await this.readFile(this.archivo);
                     if (data.length === 0) {
                         /* Si el archivo esta vacio le asigno el id: 1 */
-                        producto = { id: 1, ...producto };
+                        producto = {
+                            id: 1,
+                            timestamp: Date.now(),
+                            codigo: codigoRandom(10),
+                            ...producto,
+                        };
                     } else {
                         /* si ya tiene algun producto, se le asigna el nro de id que siga */
                         let ultimoId = data[data.length - 1].id;
-                        producto = { id: ultimoId + 1, ...producto };
+                        producto = {
+                            id: ultimoId + 1,
+                            timestamp: Date.now(),
+                            codigo: codigoRandom(10),
+                            ...producto,
+                        };
                     }
                     console.log(`Agregando producto al archivo...`);
                     data.push(producto);
