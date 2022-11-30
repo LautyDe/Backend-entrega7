@@ -32,12 +32,14 @@ router.post("/", async (req, res) => {
 router.post("/:id/productos", async (req, res) => {
     console.log(`post req recibida con exito`);
     const idCarrito = parseInt(req.params.id);
-    const idProducto = req.body;
+    const idProducto = req.body.idProducto;
     const carrito = await carritos.getById(idCarrito);
+    const carritoJson = carrito[0];
     const producto = await productos.getById(idProducto);
-    await carrito[0].productos.push(producto);
-    await carritos.modify(idCarrito, carrito);
-    res.status(201).send("Carrito modificado con exito");
+    const productoJson = producto[0];
+    await carritoJson.productos.push(productoJson);
+    await carritos.modify(idCarrito, carritoJson);
+    res.status(201).send(carritoJson);
 });
 
 router.delete("/:id", async (req, res) => {
