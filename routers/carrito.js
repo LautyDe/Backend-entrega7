@@ -54,17 +54,20 @@ router.delete("/:id/productos/:id_prod", async (req, res) => {
     const idCarrito = parseInt(req.params.id);
     const idProducto = parseInt(req.params.id_prod);
     const carrito = await carritos.getById(idCarrito);
+    const carritoJson = carrito[0];
     let indexToDelete = -1;
-    carrito.productos.forEach((producto, index) => {
+    carritoJson.productos.forEach((producto, index) => {
         if (producto.id == idProducto) {
             indexToDelete = index;
+        } else {
+            res.status(404).json(notFound);
         }
     });
     if (indexToDelete >= 0) {
-        carrito.productos.splice(indexToDelete, 1);
+        carritoJson.productos.splice(indexToDelete, 1);
     }
-    await carritos.modify(idCarrito, carrito);
-    res.status(200).json(carrito);
+    await carritos.modify(idCarrito, carritoJson);
+    res.status(200).json(carritoJson);
 });
 
 router.get("/:id/productos", async (req, res) => {
